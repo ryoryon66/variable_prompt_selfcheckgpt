@@ -2,7 +2,7 @@
 import pandas
 import threading
 from threading import Thread
-from typing import List,Tuple
+from typing import List, Optional,Tuple
 from pprint import pprint
 import bert_score
 import re
@@ -20,8 +20,12 @@ from collections import defaultdict
 class BERTScorer(bert_score.BERTScorer):
 
     def __init__(self, *args, **kwargs):
+        
+        
         super().__init__(*args, **kwargs)
         self.tokenizer = self._tokenizer
+        
+
         return
 
     def get_tokenwise_similarity(self, candidate:str, reference:str) -> Tuple[np.ndarray,List[str],List[str]]:
@@ -81,11 +85,11 @@ class BERTScorer(bert_score.BERTScorer):
 scorer : BERTScorer = BERTScorer(lang="ja",device="cuda:0")
 
 
-
+    
 def sentence_splitter(s:str):
         
     # 文末表現一覧
-    end_pattern : str = r'[.。?！？!]'
+    end_pattern : str = r'[。?！？!]'
     
     # 文末表現で分割
     split_sentense = re.split(end_pattern, s)
@@ -226,22 +230,16 @@ def get_token_level_score(response:str,samples:List[str]) -> list[list[Tuple[str
             
             
 
-            
 
-            
-    return token_level_scores
 
 if __name__ == "__main__":
     
-    model_type = "cl-tohoku/bert-base-japanese"
-    
-    
-    
 
     
-    response = "今日の琵琶湖はとても寒い。オートマトンは自動販売機のことだ。さいころはサツマイモでできている。"
-    samples = ["オートマトンは自動販売機のことだ。","オートマトンは実は自動販売機なのである。ところで今日の琵琶湖は寒い","琵琶湖は一番大きな湖なのだよ。オートマトンは自動販売機なんだってさ。"]
-     
+    
+    response = ""
+    samples = ["","",""]
+    
     
     PR_scores, RE_scores, F1_scores = get_hallucination_score(response,samples)
 

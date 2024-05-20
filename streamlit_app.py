@@ -5,11 +5,12 @@ import pandas as pd
 import utils.scoring 
 import utils.llm 
 
-
 import random
 import multiprocessing as mp
 from typing import List,Literal
 random.seed(42)
+
+from textwrap import dedent
 
 
 
@@ -30,8 +31,21 @@ def get_llm():
 llm_instance = get_llm()
 
 st.title('Hallucination Detection Demosite')
-st.write('Hallucination検出デモサイトです。')
-st.write('random prefixモードではtemperatureを0.01にすることを推奨します。')
+
+
+
+st.write(dedent("""\
+    Hallucination Detectionのデモサイトです。
+    LLM出力文ごとにHallucinationスコアを算出し、Hallucinationリスクを警告します。
+
+    ## 設定
+    - Number of samples: サンプリングフェーズでサンプリングする回数
+    - Temperature: サンプリング時のtemperature
+    - Prefix length: サンプリング時に利用する文頭random文字列の長さ
+    
+    """
+    )
+)
 
 
 # ============= ユーザー入力 =============
@@ -45,7 +59,7 @@ num_of_samples = st.slider('Number of samples', 1, 10, 3)
 temperature = st.slider('Temperature', 0.0, 1.0, 0.01)
 
 # mode selection "クエリ言い換え" or "そのまま"
-mode = st.selectbox('Mode', ('random prefix', 'same query'))
+prefix_length = st.slider('Prefix length', 0, 1000, 0)
 
 # =========== ボタンが押されたときの処理 ==============
 
@@ -61,26 +75,16 @@ if st.button('Submit'):
     
     st.write("======= sampling pahse =======")
     
-    if mode == "random prefix":
-        # sampling phase
-        for i in range(num_of_samples):
-            paraphrased_query = get_random_string(80) + f"\n「{query}」"
-            st.write(f"query{i+1}: ", paraphrased_query)
-            
-            sampled = llm_instance.generate(paraphrased_query, temperature)
-            st.write(f"sample{i+1}: ", sampled)
-            
-            samples.append(sampled)
+
+    # sampling phase
+    for i in range(num_of_samples):
+        random_str = get_random_string(prefix_length)
+        paraphrased_query = f"{random_str} {query}"
         
-    elif mode == "same query":
-    
-        # sampling phase
-        for i in range(num_of_samples):
-            sampled = llm_instance.generate(query, temperature)
-            st.write(f"query{i+1}: ", query)
-            st.write(f"sample{i+1}: ", sampled)
-            samples.append(sampled)
-    
+        sampled = llm_instance.generate(paraphrased_query, temperature)
+        st.write(f"sample{i+1}: ", sampled)
+        samples.append(sampled)
+
     st.write("======= scoring pahse =======")
     
     # scoring phase
