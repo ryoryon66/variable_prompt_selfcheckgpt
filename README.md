@@ -1,5 +1,5 @@
 # Hallucination Detection in Japanese LLMs under Zero-Resource Black-Box Fixed-Low-Temperature Constraint Through Data-Augmented Sampling
-SecHack365研究駆動コースで開発した低温度固定状況下で動作するSelfCheckGPTの実験コードとデータセット 
+2023年度のSecHack365研究駆動コースで開発した低温度固定状況下で動作するSelfCheckGPTの実験コードとデータセット 
 
 
 
